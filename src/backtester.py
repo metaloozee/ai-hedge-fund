@@ -655,32 +655,9 @@ if __name__ == "__main__":
     # Parse tickers from comma-separated string
     tickers = [ticker.strip() for ticker in args.tickers.split(",")] if args.tickers else []
 
-    # Choose analysts
-    selected_analysts = None
-    choices = questionary.checkbox(
-        "Use the Space bar to select/unselect analysts.",
-        choices=[questionary.Choice(display, value=value) for display, value in ANALYST_ORDER],
-        instruction="\n\nPress 'a' to toggle all.\n\nPress Enter when done to run the hedge fund.",
-        validate=lambda x: len(x) > 0 or "You must select at least one analyst.",
-        style=questionary.Style(
-            [
-                ("checkbox-selected", "fg:green"),
-                ("selected", "fg:green noinherit"),
-                ("highlighted", "noinherit"),
-                ("pointer", "noinherit"),
-            ]
-        ),
-    ).ask()
-
-    if not choices:
-        print("\n\nInterrupt received. Exiting...")
-        sys.exit(0)
-    else:
-        selected_analysts = choices
-        print(
-            f"\nSelected analysts: "
-            f"{', '.join(Fore.GREEN + choice.title().replace('_', ' ') + Style.RESET_ALL for choice in choices)}"
-        )
+    # As we only have sentiment_analyst, always select it
+    selected_analysts = ["sentiment_analyst"]
+    print(f"\nSelected analyst: {Fore.GREEN}Sentiment Analyst{Style.RESET_ALL}\n")
 
     # Select LLM model
     model_choice = questionary.select(

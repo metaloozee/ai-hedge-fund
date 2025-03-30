@@ -5,16 +5,10 @@ from langchain_core.messages import HumanMessage
 from langgraph.graph import END, StateGraph
 from colorama import Fore, Back, Style, init
 import questionary
-from agents.ben_graham import ben_graham_agent
-from agents.bill_ackman import bill_ackman_agent
-from agents.fundamentals import fundamentals_agent
-from agents.portfolio_manager import portfolio_management_agent
-from agents.technicals import technical_analyst_agent
-from agents.risk_manager import risk_management_agent
 from agents.sentiment import sentiment_agent
-from agents.warren_buffett import warren_buffett_agent
+from agents.risk_manager import risk_management_agent
+from agents.portfolio_manager import portfolio_management_agent
 from graph.state import AgentState
-from agents.valuation import valuation_agent
 from utils.display import print_trading_output
 from utils.analysts import ANALYST_ORDER, get_analyst_nodes
 from utils.progress import progress
@@ -171,29 +165,9 @@ if __name__ == "__main__":
     # Parse tickers from comma-separated string
     tickers = [ticker.strip() for ticker in args.tickers.split(",")]
 
-    # Select analysts
-    selected_analysts = None
-    choices = questionary.checkbox(
-        "Select your AI analysts.",
-        choices=[questionary.Choice(display, value=value) for display, value in ANALYST_ORDER],
-        instruction="\n\nInstructions: \n1. Press Space to select/unselect analysts.\n2. Press 'a' to select/unselect all.\n3. Press Enter when done to run the hedge fund.\n",
-        validate=lambda x: len(x) > 0 or "You must select at least one analyst.",
-        style=questionary.Style(
-            [
-                ("checkbox-selected", "fg:green"),
-                ("selected", "fg:green noinherit"),
-                ("highlighted", "noinherit"),
-                ("pointer", "noinherit"),
-            ]
-        ),
-    ).ask()
-
-    if not choices:
-        print("\n\nInterrupt received. Exiting...")
-        sys.exit(0)
-    else:
-        selected_analysts = choices
-        print(f"\nSelected analysts: {', '.join(Fore.GREEN + choice.title().replace('_', ' ') + Style.RESET_ALL for choice in choices)}\n")
+    # As we only have sentiment_analyst, always select it
+    selected_analysts = ["sentiment_analyst"]
+    print(f"\nSelected analyst: {Fore.GREEN}Sentiment Analyst{Style.RESET_ALL}\n")
 
     # Select LLM model
     model_choice = questionary.select(
@@ -225,11 +199,7 @@ if __name__ == "__main__":
     app = workflow.compile()
 
     if args.show_agent_graph:
-        file_path = ""
-        if selected_analysts is not None:
-            for selected_analyst in selected_analysts:
-                file_path += selected_analyst + "_"
-            file_path += "graph.png"
+        file_path = "sentiment_analyst_graph.png"
         save_graph_as_png(app, file_path)
 
     # Validate dates if provided
@@ -248,33 +218,23 @@ if __name__ == "__main__":
     # Set the start and end dates
     end_date = args.end_date or datetime.now().strftime("%Y-%m-%d")
     if not args.start_date:
-        # Calculate 3 months before end_date
-        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
-        start_date = (end_date_obj - relativedelta(months=3)).strftime("%Y-%m-%d")
+        # Default start date is 3 months before end date
+        start_date = (
+            datetime.strptime(end_date, "%Y-%m-%d") - relativedelta(months=3)
+        ).strftime("%Y-%m-%d")
     else:
         start_date = args.start_date
 
-    # Initialize portfolio with cash amount and stock positions
+    # Initialize the portfolio
     portfolio = {
-        "cash": args.initial_cash,  # Initial cash amount
-        "margin_requirement": args.margin_requirement,  # Initial margin requirement
-        "positions": {
-            ticker: {
-                "long": 0,  # Number of shares held long
-                "short": 0,  # Number of shares held short
-                "long_cost_basis": 0.0,  # Average cost basis for long positions
-                "short_cost_basis": 0.0,  # Average price at which shares were sold short
-            } for ticker in tickers
-        },
-        "realized_gains": {
-            ticker: {
-                "long": 0.0,  # Realized gains from long positions
-                "short": 0.0,  # Realized gains from short positions
-            } for ticker in tickers
-        }
+        "cash": args.initial_cash,
+        "positions": {},
+        "margin_requirement": args.margin_requirement,
+        "history": [],
     }
 
-    # Run the hedge fund
+    print("\nHedge Fund is running...")
+    print("\nSetting up the trading system...")
     result = run_hedge_fund(
         tickers=tickers,
         start_date=start_date,
@@ -285,4 +245,9 @@ if __name__ == "__main__":
         model_name=model_choice,
         model_provider=model_provider,
     )
-    print_trading_output(result)
+
+    if result and result["decisions"]:
+        # Process and display results
+        print_trading_output(result["decisions"], result["analyst_signals"])
+    else:
+        print(f"{Fore.RED}Failed to generate trading decisions.{Style.RESET_ALL}")

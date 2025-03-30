@@ -4,21 +4,11 @@ This is a proof of concept for an AI-powered hedge fund.  The goal of this proje
 
 This system employs several agents working together:
 
-1. Ben Graham Agent - The godfather of value investing, only buys hidden gems with a margin of safety
-2. Bill Ackman Agent - An activist investors, takes bold positions and pushes for change
-3. Cathie Wood Agent - The queen of growth investing, believes in the power of innovation and disruption
-4. Charlie Munger Agent - Warren Buffett's partner, only buys wonderful businesses at fair prices
-5. Phil Fisher Agent - Legendary growth investor who mastered scuttlebutt analysis
-6. Stanley Druckenmiller Agent - Macro legend who hunts for asymmetric opportunities with growth potential
-7. Warren Buffett Agent - The oracle of Omaha, seeks wonderful companies at a fair price
-8. Valuation Agent - Calculates the intrinsic value of a stock and generates trading signals
-9. Sentiment Agent - Analyzes market sentiment and generates trading signals
-10. Fundamentals Agent - Analyzes fundamental data and generates trading signals
-11. Technicals Agent - Analyzes technical indicators and generates trading signals
-12. Risk Manager - Calculates risk metrics and sets position limits
-13. Portfolio Manager - Makes final trading decisions and generates orders
+1. Sentiment Agent - Analyzes market sentiment and generates trading signals
+2. Risk Manager - Calculates risk metrics and sets position limits
+3. Portfolio Manager - Makes final trading decisions and generates orders
     
-<img width="1042" alt="Screenshot 2025-03-22 at 6 19 07 PM" src="https://github.com/user-attachments/assets/cbae3dcf-b571-490d-b0ad-3f0f035ac0d4" />
+<img width="1042" alt="Screenshot 2025-03-22 at 6 19 07 PM" src="https://github.com/user-attachments/assets/cbae3dcf-b571-490d-b0ad-3f0f035ac0d4" />
 
 
 **Note**: the system simulates trading decisions, it does not actually trade.
@@ -100,7 +90,7 @@ poetry run python src/main.py --ticker AAPL,MSFT,NVDA
 ```
 
 **Example Output:**
-<img width="992" alt="Screenshot 2025-01-06 at 5 50 17 PM" src="https://github.com/user-attachments/assets/e8ca04bf-9989-4a7d-a8b4-34e04666663b" />
+<img width="992" alt="Screenshot 2025-01-06 at 5 50 17 PM" src="https://github.com/user-attachments/assets/e8ca04bf-9989-4a7d-a8b4-34e04666663b" />
 
 You can also specify a `--show-reasoning` flag to print the reasoning of each agent to the console.
 
@@ -120,7 +110,7 @@ poetry run python src/backtester.py --ticker AAPL,MSFT,NVDA
 ```
 
 **Example Output:**
-<img width="941" alt="Screenshot 2025-01-06 at 5 47 52 PM" src="https://github.com/user-attachments/assets/00e794ea-8628-44e6-9a84-8f8a31ad3b47" />
+<img width="941" alt="Screenshot 2025-01-06 at 5 47 52 PM" src="https://github.com/user-attachments/assets/00e794ea-8628-44e6-9a84-8f8a31ad3b47" />
 
 You can optionally specify the start and end dates to backtest over a specific time period.
 
@@ -133,18 +123,13 @@ poetry run python src/backtester.py --ticker AAPL,MSFT,NVDA --start-date 2024-01
 ai-hedge-fund/
 ├── src/
 │   ├── agents/                   # Agent definitions and workflow
-│   │   ├── bill_ackman.py        # Bill Ackman agent
-│   │   ├── fundamentals.py       # Fundamental analysis agent
 │   │   ├── portfolio_manager.py  # Portfolio management agent
 │   │   ├── risk_manager.py       # Risk management agent
 │   │   ├── sentiment.py          # Sentiment analysis agent
-│   │   ├── technicals.py         # Technical analysis agent
-│   │   ├── valuation.py          # Valuation analysis agent
-│   │   ├── warren_buffett.py     # Warren Buffett agent
 │   ├── tools/                    # Agent tools
 │   │   ├── api.py                # API tools
 │   ├── backtester.py             # Backtesting tools
-│   ├── main.py # Main entry point
+│   ├── main.py                   # Main entry point
 ├── pyproject.toml
 ├── ...
 ```
